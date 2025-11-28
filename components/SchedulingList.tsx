@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { Scheduling, SchedulingStatus } from '../types';
+import { Scheduling, SchedulingStatus, SchedulingPriority } from '../types';
 import { Search, Filter, Trash2, Edit2, Calendar, MapPin, CheckCircle, Clock, User, FileText, Download, FileSpreadsheet, Image as ImageIcon, Briefcase, PlayCircle, AlertCircle, Share2, Printer, Camera, Copy, Phone } from 'lucide-react';
 
 interface SchedulingListProps {
@@ -49,6 +50,31 @@ const SchedulingList: React.FC<SchedulingListProps> = ({ schedulings, onEdit, on
     }
   };
 
+  const getPriorityStyles = (priority: SchedulingPriority) => {
+    switch(priority) {
+      case SchedulingPriority.URGENT:
+        return 'bg-red-600 text-white border-red-700 animate-pulse font-black shadow-lg shadow-red-500/30';
+      case SchedulingPriority.HIGH:
+        return 'bg-orange-500 text-white border-orange-600 font-bold';
+      case SchedulingPriority.MEDIUM:
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200 font-bold';
+      case SchedulingPriority.LOW:
+        return 'bg-blue-100 text-blue-800 border-blue-200 font-medium';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200 font-medium';
+    }
+  };
+
+  const getPriorityLabel = (priority: SchedulingPriority) => {
+    switch(priority) {
+      case SchedulingPriority.URGENT: return 'URGENTE';
+      case SchedulingPriority.HIGH: return 'ALTA';
+      case SchedulingPriority.MEDIUM: return 'MÉDIA';
+      case SchedulingPriority.LOW: return 'BAIXA';
+      default: return 'NORMAL';
+    }
+  };
+
   const filtered = schedulings.filter(item => {
     // Advanced Search Logic: Split by spaces to allow "Client Service" search pattern
     const searchTerms = searchTerm.toLowerCase().trim().split(/\s+/).filter(term => term.length > 0);
@@ -91,9 +117,10 @@ const SchedulingList: React.FC<SchedulingListProps> = ({ schedulings, onEdit, on
     doc.setFontSize(10);
     doc.text(`Gerado em: ${new Date().toLocaleString()}`, 14, 28);
 
-    const tableColumn = ["Ordem", "Cliente", "Contato", "Serviço", "Data", "Status"];
+    const tableColumn = ["Ordem", "Prio.", "Cliente", "Contato", "Serviço", "Data", "Status"];
     const tableRows = filtered.map(item => [
       item.orderNumber,
+      getPriorityLabel(item.priority || SchedulingPriority.MEDIUM),
       item.client,
       item.phone || '-',
       item.service,
@@ -119,6 +146,7 @@ const SchedulingList: React.FC<SchedulingListProps> = ({ schedulings, onEdit, on
     
     const ws = XLSX.utils.json_to_sheet(filtered.map(item => ({
       Ordem: item.orderNumber,
+      Prioridade: getPriorityLabel(item.priority || SchedulingPriority.MEDIUM),
       Cliente: item.client,
       Telefone: item.phone,
       Serviço: item.service,
@@ -144,7 +172,7 @@ const SchedulingList: React.FC<SchedulingListProps> = ({ schedulings, onEdit, on
     content += "╚════════════════════════════════════════════════╝\n\n";
 
     filtered.forEach(item => {
-      content += `🔶 ORDEM Nº ${item.orderNumber}  [ ${item.status.toUpperCase()} ]\n`;
+      content += `🔶 ORDEM Nº ${item.orderNumber} [${getPriorityLabel(item.priority || SchedulingPriority.MEDIUM)}] - ${item.status.toUpperCase()}\n`;
       content += `👤 CLIENTE:  ${item.client.toUpperCase()}\n`;
       if(item.phone) content += `📞 CONTATO:  ${item.phone}\n`;
       content += `🛠️ SERVIÇO:  ${item.service}\n`;
@@ -191,7 +219,7 @@ const SchedulingList: React.FC<SchedulingListProps> = ({ schedulings, onEdit, on
   // --- Individual Card Actions ---
 
   const handleShare = (item: Scheduling) => {
-    const text = `👷 *ORDEM DE SERVIÇO CBC SOLAR #${item.orderNumber}*\n\n` +
+    const text = `👷 *ORDEM DE SERVIÇO CBC SOLAR #${item.orderNumber}* (${getPriorityLabel(item.priority || SchedulingPriority.MEDIUM)})\n\n` +
       `👤 *Cliente:* ${item.client}\n` +
       (item.phone ? `📞 *Tel:* ${item.phone}\n` : '') +
       `📍 *Local:* ${item.location}\n` +
@@ -215,7 +243,7 @@ const SchedulingList: React.FC<SchedulingListProps> = ({ schedulings, onEdit, on
     doc.text(`Ordem de Serviço #${item.orderNumber}`, 105, 20, { align: 'center' });
     
     doc.setFontSize(12);
-    doc.text(`CBC SOLAR PROJETOS`, 105, 30, { align: 'center' });
+    doc.text(`CBC SOLAR PROJETOS - Prioridade: ${getPriorityLabel(item.priority || SchedulingPriority.MEDIUM)}`, 105, 30, { align: 'center' });
     
     doc.setLineWidth(0.5);
     doc.line(20, 35, 190, 35);
@@ -253,6 +281,7 @@ const SchedulingList: React.FC<SchedulingListProps> = ({ schedulings, onEdit, on
     const content = `╔══════════════════════════════════════╗\n` +
       `║      ORDEM DE SERVIÇO #${item.orderNumber}        ║\n` +
       `╚══════════════════════════════════════╝\n` +
+      `⚠️ PRIORIDADE: ${getPriorityLabel(item.priority || SchedulingPriority.MEDIUM)}\n` +
       `👤 CLIENTE: ${item.client}\n` +
       (item.phone ? `📞 CONTATO: ${item.phone}\n` : '') +
       `📍 LOCAL:   ${item.location}\n` +
@@ -359,7 +388,9 @@ const SchedulingList: React.FC<SchedulingListProps> = ({ schedulings, onEdit, on
             {filtered.map(item => {
               const styles = getStatusStyles(item.status);
               const cardId = `card-${item.id}`;
-              
+              const priority = item.priority || SchedulingPriority.MEDIUM;
+              const prioStyle = getPriorityStyles(priority);
+
               return (
                 <div 
                   key={item.id}
@@ -367,8 +398,13 @@ const SchedulingList: React.FC<SchedulingListProps> = ({ schedulings, onEdit, on
                   className={`relative rounded-3xl p-0 shadow-lg border-4 hover:shadow-2xl transition-all duration-300 flex flex-col md:flex-row overflow-hidden ${styles.card}`}
                 >
                   
-                  {/* Left Block: ORDER NUMBER */}
+                  {/* Left Block: ORDER NUMBER & PRIORITY */}
                   <div className={`w-full md:w-40 flex flex-col items-center justify-center p-4 border-b md:border-b-0 md:border-r ${styles.divider} ${styles.overlay} shrink-0`}>
+                     
+                     <div className={`px-2 py-1 rounded text-[10px] uppercase tracking-wider border mb-2 w-full text-center ${prioStyle}`}>
+                       {getPriorityLabel(priority)}
+                     </div>
+
                      <div className="text-center">
                        <span className={`block text-xs font-black uppercase tracking-widest mb-2 opacity-70 ${styles.text}`}>Ordem</span>
                        <span className={`block text-6xl font-black leading-none ${styles.text}`}>#{item.orderNumber}</span>

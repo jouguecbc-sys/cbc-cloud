@@ -8,7 +8,7 @@ import {
   getSalespeopleList, saveSalespeopleList,
   getTeamsList, saveTeamsList 
 } from '../services/storageService';
-import { Scheduling, SchedulingStatus } from '../types';
+import { Scheduling, SchedulingStatus, SchedulingPriority } from '../types';
 
 interface BackupModalProps {
   isOpen: boolean;
@@ -292,7 +292,8 @@ const BackupModal: React.FC<BackupModalProps> = ({ isOpen, onClose }) => {
             status: mapStatus(getVal(['Status'])),
             team: getVal(['Equipe', 'Tecnico']),
             salesperson: getVal(['Vendedor']),
-            observation: getVal(['Obs', 'Observacao'])
+            observation: getVal(['Obs', 'Observacao']),
+            priority: SchedulingPriority.MEDIUM, // Default
            });
         }
 

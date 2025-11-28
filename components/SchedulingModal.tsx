@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
-import { Scheduling, SchedulingStatus } from '../types';
-import { X, Save, Plus, Calendar, MapPin, User, FileText, Briefcase, Phone } from 'lucide-react';
+import { Scheduling, SchedulingStatus, SchedulingPriority } from '../types';
+import { X, Save, Plus, Calendar, MapPin, User, FileText, Briefcase, Phone, AlertTriangle } from 'lucide-react';
 
 interface SchedulingModalProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ const SchedulingModal: React.FC<SchedulingModalProps> = ({
     scheduledTime: '',
     value: '' as any,
     status: SchedulingStatus.PENDING,
+    priority: SchedulingPriority.MEDIUM,
     completionDate: ''
   };
 
@@ -56,7 +58,8 @@ const SchedulingModal: React.FC<SchedulingModalProps> = ({
         ...schedulingToEdit,
         phone: schedulingToEdit.phone || '',
         value: schedulingToEdit.value || '',
-        completionDate: schedulingToEdit.completionDate || ''
+        completionDate: schedulingToEdit.completionDate || '',
+        priority: schedulingToEdit.priority || SchedulingPriority.MEDIUM
       });
     } else {
       setFormData(initialFormState);
@@ -260,18 +263,37 @@ const SchedulingModal: React.FC<SchedulingModalProps> = ({
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-600 mb-1">Valor (R$)</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">R$</span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cbc-green outline-none bg-white text-gray-900 shadow-sm"
-                    placeholder="0,00"
-                    value={formData.value}
-                    onChange={e => setFormData({ ...formData, value: e.target.value })}
-                  />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1">Valor (R$)</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">R$</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cbc-green outline-none bg-white text-gray-900 shadow-sm"
+                      placeholder="0,00"
+                      value={formData.value}
+                      onChange={e => setFormData({ ...formData, value: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-600 mb-1 flex items-center gap-1">
+                     <AlertTriangle size={14} className="text-cbc-orange"/> Prioridade
+                  </label>
+                  <select
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 outline-none bg-white text-gray-900 shadow-sm font-bold
+                      ${formData.priority === SchedulingPriority.URGENT ? 'text-red-600 border-red-300 focus:ring-red-500' : 
+                        formData.priority === SchedulingPriority.HIGH ? 'text-orange-600' : 'text-gray-700'}`}
+                    value={formData.priority}
+                    onChange={e => setFormData({ ...formData, priority: e.target.value as SchedulingPriority })}
+                  >
+                    <option value={SchedulingPriority.LOW}>Baixa</option>
+                    <option value={SchedulingPriority.MEDIUM}>Média</option>
+                    <option value={SchedulingPriority.HIGH}>Alta</option>
+                    <option value={SchedulingPriority.URGENT}>⚠️ URGENTE</option>
+                  </select>
                 </div>
               </div>
             </div>

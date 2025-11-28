@@ -1,0 +1,34 @@
+/* 
+  Tailwind CSS é carregado via CDN no index.html.
+  Este arquivo contém apenas estilos globais nativos.
+*/
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #F0FDF4; /* cbc-bg */
+  overflow: hidden;
+}
+
+/* Custom Scrollbar (Para o resto do sistema - Listas e Dashboard) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+::-webkit-scrollbar-thumb {
+  background: #ccc; 
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #2E8B57; 
+}
+
+/* Utility to hide scrollbar (Usado no Menu Lateral) */
+.scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}

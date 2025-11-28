@@ -38,6 +38,13 @@ export enum SchedulingStatus {
   RESOLVED = 'resolvido'
 }
 
+export enum SchedulingPriority {
+  LOW = 'baixa',
+  MEDIUM = 'media',
+  HIGH = 'alta',
+  URGENT = 'urgente'
+}
+
 export interface Scheduling {
   id: string;
   orderNumber: string; // Começa em 01, automatico
@@ -53,6 +60,7 @@ export interface Scheduling {
   scheduledTime: string; // Hora agendada (opcional, separado para facilitar input)
   value: number;
   status: SchedulingStatus;
+  priority: SchedulingPriority; // Novo campo Prioridade
   completionDate?: string; // Inserir data quando status for resolvido
 }
 
@@ -72,7 +80,29 @@ export interface InverterConfig {
   scheduledTime: string;
   value: number; // Custo ou Valor do serviço
   status: SchedulingStatus; // Reutilizando o enum de status
+  priority: SchedulingPriority; // Novo campo Prioridade
   completionDate?: string;
+}
+
+// Novo tipo para Instalação
+export interface Installation {
+  id: string;
+  orderNumber: string;
+  registrationDate: string;
+  client: string;
+  location: string;
+  salesperson: string;
+  contractDate: string; // Data do contrato
+  deadlineDate: string; // Data limite (Contrato + 90 dias)
+  arrivalDate: string; // Chegada das placas
+  panelQuantity: number;
+  kwp: number;
+  scheduledDate: string; // Data agendada da instalação
+  completionDate?: string; // Data conclusão
+  team: string;
+  status: SchedulingStatus;
+  priority: SchedulingPriority;
+  observation: string;
 }
 
 export interface StatisticsData {
@@ -81,7 +111,7 @@ export interface StatisticsData {
   fill: string;
 }
 
-export type ViewMode = 'dashboard' | 'scheduling' | 'inverter_config' | TaskCategory;
+export type ViewMode = 'dashboard' | 'scheduling' | 'inverter_config' | 'installation' | TaskCategory;
 
 // --- AUTH TYPES ---
 export type UserRole = 'admin' | 'user';

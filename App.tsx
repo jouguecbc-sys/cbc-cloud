@@ -1,20 +1,24 @@
+
 import React, { useState, useEffect } from 'react';
-import { Plus, Bell, User as UserIcon, Trash2, Briefcase, User, Users, Calendar, Settings, Loader2 } from 'lucide-react';
+import { Plus, Bell, User as UserIcon, Trash2, Briefcase, User, Users, Calendar, Settings, Loader2, Wrench, Menu } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import SchedulingList from './components/SchedulingList'; 
 import SchedulingModal from './components/SchedulingModal'; 
 import InverterConfigList from './components/InverterConfigList';
 import InverterConfigModal from './components/InverterConfigModal';
+import InstallationList from './components/InstallationList';
+import InstallationModal from './components/InstallationModal';
 import BackupModal from './components/BackupModal';
 import LoginScreen from './components/LoginScreen';
 import UserManagementModal from './components/UserManagementModal';
 import ChangePasswordModal from './components/ChangePasswordModal';
-import { Task, ViewMode, TaskCategory, TaskStatus, Scheduling, SchedulingStatus, InverterConfig, UserRole } from './types';
+import { Task, ViewMode, TaskCategory, TaskStatus, Scheduling, SchedulingStatus, InverterConfig, Installation, UserRole, SchedulingPriority } from './types';
 import { 
   getTasks, saveTasks, 
   getSchedulings, saveScheduling, deleteScheduling,
   getInverterConfigs, saveInverterConfig, deleteInverterConfig,
+  getInstallations, saveInstallation, deleteInstallation,
   getServicesList, saveServicesList, 
   getSalespeopleList, saveSalespeopleList, 
   getTeamsList, saveTeamsList,
@@ -27,7 +31,7 @@ interface DeleteModalProps {
   onClose: () => void;
   onConfirm: () => void;
   title: string;
-  type: 'tarefa' | 'agendamento' | 'inverter';
+  type: 'tarefa' | 'agendamento' | 'inverter' | 'installation';
   categoryLabel?: string;
 }
 
@@ -37,13 +41,14 @@ const DeleteConfirmationModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, 
   const getIcon = () => {
     if (type === 'agendamento') return <Calendar size={24} />;
     if (type === 'inverter') return <Settings size={24} />;
+    if (type === 'installation') return <Wrench size={24} />;
     if (categoryLabel === 'Trabalho') return <Briefcase size={24} />;
     if (categoryLabel === 'Equipe') return <Users size={24} />;
     return <User size={24} />;
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
       <div className="bg-white rounded-xl p-6 shadow-2xl max-w-sm w-full animate-in fade-in zoom-in duration-200">
         <div className="flex flex-col items-center text-center">
           <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center text-red-600 mb-4 border-4 border-red-100">
@@ -55,7 +60,8 @@ const DeleteConfirmationModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, 
               ${categoryLabel === 'Trabalho' ? 'bg-blue-100 text-blue-700' : 
                 categoryLabel === 'Equipe' ? 'bg-orange-100 text-orange-700' : 
                 categoryLabel === 'Pessoal' ? 'bg-purple-100 text-purple-700' : 
-                type === 'inverter' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>
+                type === 'inverter' ? 'bg-blue-100 text-blue-700' : 
+                type === 'installation' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-700'}`}>
                {getIcon()} {categoryLabel}
             </span>
           )}
@@ -102,6 +108,8 @@ const App: React.FC = () => {
   const [schedulings, setSchedulings] = useState<Scheduling[]>([]);
   // State for Inverter Configs
   const [inverterConfigs, setInverterConfigs] = useState<InverterConfig[]>([]);
+  // State for Installations
+  const [installations, setInstallations] = useState<Installation[]>([]);
   
   // State for Lists (Select options)
   const [services, setServices] = useState<string[]>([]);
@@ -110,18 +118,23 @@ const App: React.FC = () => {
   
   const [currentView, setCurrentView] = useState<ViewMode>('dashboard');
   
+  // Mobile Sidebar State
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  
   // Modals State
   const [isSchedulingModalOpen, setIsSchedulingModalOpen] = useState(false);
   const [isInverterModalOpen, setIsInverterModalOpen] = useState(false);
+  const [isInstallationModalOpen, setIsInstallationModalOpen] = useState(false);
   const [isBackupModalOpen, setIsBackupModalOpen] = useState(false);
   const [isUsersModalOpen, setIsUsersModalOpen] = useState(false);
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
   
   const [editingScheduling, setEditingScheduling] = useState<Scheduling | null>(null);
   const [editingInverterConfig, setEditingInverterConfig] = useState<InverterConfig | null>(null);
+  const [editingInstallation, setEditingInstallation] = useState<Installation | null>(null);
   
   // Delete Modal State
-  const [itemToDelete, setItemToDelete] = useState<{ id: string, title: string, type: 'tarefa' | 'agendamento' | 'inverter', categoryLabel?: string } | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<{ id: string, title: string, type: 'tarefa' | 'agendamento' | 'inverter' | 'installation', categoryLabel?: string } | null>(null);
   
   // Alarm State
   const [activeAlarm, setActiveAlarm] = useState<string | null>(null);
@@ -189,6 +202,9 @@ const App: React.FC = () => {
 
         const dbInverters = await getInverterConfigs();
         setInverterConfigs(dbInverters);
+
+        const dbInstallations = await getInstallations();
+        setInstallations(dbInstallations);
 
         const dbServices = await getServicesList();
         setServices(dbServices);
@@ -293,6 +309,25 @@ const App: React.FC = () => {
     setSchedulings(prev => prev.map(s => s.id === id ? updatedItem : s));
     await saveScheduling(updatedItem);
   };
+  
+  const handleSchedulingPriorityChange = async (id: string, currentPriority: SchedulingPriority) => {
+    const priorityOrder = [
+      SchedulingPriority.LOW,
+      SchedulingPriority.MEDIUM,
+      SchedulingPriority.HIGH,
+      SchedulingPriority.URGENT
+    ];
+    
+    const currentIndex = priorityOrder.indexOf(currentPriority || SchedulingPriority.MEDIUM);
+    const nextPriority = priorityOrder[(currentIndex + 1) % priorityOrder.length];
+
+    const itemToUpdate = schedulings.find(s => s.id === id);
+    if (!itemToUpdate) return;
+
+    const updatedItem = { ...itemToUpdate, priority: nextPriority };
+    setSchedulings(prev => prev.map(s => s.id === id ? updatedItem : s));
+    await saveScheduling(updatedItem);
+  };
 
   // --- Inverter Config Handlers ---
   const handleCreateInverter = async (data: any, newItems?: { service?: string; salesperson?: string; team?: string }) => {
@@ -344,6 +379,75 @@ const App: React.FC = () => {
     await saveInverterConfig(updatedItem);
   };
 
+  const handleInverterPriorityChange = async (id: string, currentPriority: SchedulingPriority) => {
+    const priorityOrder = [
+      SchedulingPriority.LOW,
+      SchedulingPriority.MEDIUM,
+      SchedulingPriority.HIGH,
+      SchedulingPriority.URGENT
+    ];
+    
+    const currentIndex = priorityOrder.indexOf(currentPriority || SchedulingPriority.MEDIUM);
+    const nextPriority = priorityOrder[(currentIndex + 1) % priorityOrder.length];
+
+    const itemToUpdate = inverterConfigs.find(s => s.id === id);
+    if (!itemToUpdate) return;
+
+    const updatedItem = { ...itemToUpdate, priority: nextPriority };
+    setInverterConfigs(prev => prev.map(s => s.id === id ? updatedItem : s));
+    await saveInverterConfig(updatedItem);
+  };
+
+  // --- Installation Handlers ---
+  const handleCreateInstallation = async (data: any, newItems?: { salesperson?: string; team?: string }) => {
+    let nextNum = 1;
+    if (installations.length > 0) {
+      const maxOrder = Math.max(...installations.map(s => parseInt(s.orderNumber) || 0));
+      nextNum = maxOrder + 1;
+    }
+    const orderNumberStr = nextNum.toString().padStart(2, '0');
+
+    const newInstall: Installation = {
+      ...data,
+      id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+      registrationDate: new Date().toISOString(),
+      orderNumber: orderNumberStr
+    };
+
+    setInstallations(prev => [newInstall, ...prev]);
+    await saveInstallation(newInstall);
+    handleNewListsItems(newItems);
+  };
+
+  const handleUpdateInstallation = async (data: any, newItems?: { salesperson?: string; team?: string }) => {
+    setInstallations(prev => prev.map(s => s.id === data.id ? data : s));
+    setEditingInstallation(null);
+    await saveInstallation(data);
+    handleNewListsItems(newItems);
+  };
+
+  const handleInstallationStatusChange = async (id: string, currentStatus: SchedulingStatus) => {
+    let newStatus = SchedulingStatus.PENDING;
+    if (currentStatus === SchedulingStatus.PENDING) newStatus = SchedulingStatus.IN_PROGRESS;
+    else if (currentStatus === SchedulingStatus.IN_PROGRESS) newStatus = SchedulingStatus.RESOLVED;
+    else if (currentStatus === SchedulingStatus.RESOLVED) newStatus = SchedulingStatus.PENDING;
+
+    const itemToUpdate = installations.find(s => s.id === id);
+    if (!itemToUpdate) return;
+
+    let completionDate = itemToUpdate.completionDate;
+    if (newStatus === SchedulingStatus.RESOLVED && !completionDate) {
+      completionDate = new Date().toISOString().split('T')[0];
+    } else if (newStatus !== SchedulingStatus.RESOLVED) {
+      completionDate = '';
+    }
+
+    const updatedItem = { ...itemToUpdate, status: newStatus, completionDate };
+
+    setInstallations(prev => prev.map(s => s.id === id ? updatedItem : s));
+    await saveInstallation(updatedItem);
+  };
+
   // Helper for lists
   const handleNewListsItems = async (newItems?: { service?: string; salesperson?: string; team?: string }) => {
     if (newItems?.service && !services.includes(newItems.service)) {
@@ -364,7 +468,7 @@ const App: React.FC = () => {
   };
 
   // --- Delete Logic ---
-  const handleDeleteRequest = (id: string, type: 'tarefa' | 'agendamento' | 'inverter') => {
+  const handleDeleteRequest = (id: string, type: 'tarefa' | 'agendamento' | 'inverter' | 'installation') => {
     if (type === 'tarefa') {
       const item = tasks.find(t => t.id === id);
       if (item) setItemToDelete({ id, title: item.title, type, categoryLabel: item.category });
@@ -374,6 +478,9 @@ const App: React.FC = () => {
     } else if (type === 'inverter') {
       const item = inverterConfigs.find(s => s.id === id);
       if (item) setItemToDelete({ id, title: `Config #${item.orderNumber} - ${item.client}`, type, categoryLabel: 'Configuração Inversor' });
+    } else if (type === 'installation') {
+      const item = installations.find(s => s.id === id);
+      if (item) setItemToDelete({ id, title: `Obra #${item.orderNumber} - ${item.client}`, type, categoryLabel: 'Instalação' });
     }
   };
 
@@ -388,6 +495,9 @@ const App: React.FC = () => {
     } else if (itemToDelete.type === 'inverter') {
       setInverterConfigs(prev => prev.filter(s => s.id !== itemToDelete.id));
       await deleteInverterConfig(itemToDelete.id);
+    } else if (itemToDelete.type === 'installation') {
+      setInstallations(prev => prev.filter(s => s.id !== itemToDelete.id));
+      await deleteInstallation(itemToDelete.id);
     }
     setItemToDelete(null);
   };
@@ -403,6 +513,11 @@ const App: React.FC = () => {
     setIsInverterModalOpen(true);
   };
 
+  const openInstallationModal = (install?: Installation) => {
+    setEditingInstallation(install || null);
+    setIsInstallationModalOpen(true);
+  };
+
   const getNextOrderNumber = () => {
     if (schedulings.length === 0) return '01';
     const maxOrder = Math.max(...schedulings.map(s => parseInt(s.orderNumber) || 0));
@@ -412,6 +527,12 @@ const App: React.FC = () => {
   const getNextInverterOrderNumber = () => {
     if (inverterConfigs.length === 0) return '01';
     const maxOrder = Math.max(...inverterConfigs.map(s => parseInt(s.orderNumber) || 0));
+    return (maxOrder + 1).toString().padStart(2, '0');
+  };
+
+  const getNextInstallationOrderNumber = () => {
+    if (installations.length === 0) return '01';
+    const maxOrder = Math.max(...installations.map(s => parseInt(s.orderNumber) || 0));
     return (maxOrder + 1).toString().padStart(2, '0');
   };
 
@@ -441,6 +562,8 @@ const App: React.FC = () => {
           onStatusChange={handleSchedulingStatusChange}
           inverterConfigs={inverterConfigs}
           onInverterStatusChange={handleInverterStatusChange}
+          onPriorityChange={handleSchedulingPriorityChange}
+          onInverterPriorityChange={handleInverterPriorityChange}
         />
       );
     }
@@ -450,6 +573,14 @@ const App: React.FC = () => {
         onEdit={openInverterModal} 
         onDelete={(id) => handleDeleteRequest(id, 'inverter')} 
         onStatusChange={handleInverterStatusChange}
+      />;
+    }
+    if (currentView === 'installation') {
+      return <InstallationList 
+        installations={installations} 
+        onEdit={openInstallationModal} 
+        onDelete={(id) => handleDeleteRequest(id, 'installation')} 
+        onStatusChange={handleInstallationStatusChange}
       />;
     }
     // Default to scheduling list
@@ -488,22 +619,31 @@ const App: React.FC = () => {
         onChangePassword={() => setIsChangePasswordModalOpen(true)}
         onLogout={handleLogout}
         userRole={userRole}
+        isOpenMobile={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
       />
 
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm shrink-0 z-10">
+        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8 shadow-sm shrink-0 z-10">
           <div className="flex items-center gap-4">
-             <h2 className="text-xl font-bold text-gray-800">
-               {currentView === 'dashboard' ? 'Dashboard' : currentView === 'inverter_config' ? 'Configuração de Inversores' : 'Agendamentos'}
+             {/* Mobile Menu Toggle */}
+             <button onClick={() => setIsMobileSidebarOpen(true)} className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                <Menu size={24} />
+             </button>
+
+             <h2 className="text-lg lg:text-xl font-bold text-gray-800 truncate max-w-[150px] lg:max-w-none">
+               {currentView === 'dashboard' ? 'Dashboard' : 
+                currentView === 'inverter_config' ? 'Config. Inversores' : 
+                currentView === 'installation' ? 'Instalações' : 'Agendamentos'}
              </h2>
-             <span className="h-6 w-px bg-gray-300 mx-2"></span>
-             <p className="text-sm text-gray-500 font-medium capitalize">
+             <span className="h-6 w-px bg-gray-300 mx-2 hidden sm:block"></span>
+             <p className="text-sm text-gray-500 font-medium capitalize hidden sm:block">
                {time.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
              </p>
           </div>
 
-          <div className="flex items-center gap-6">
-            <p className="text-2xl font-light text-cbc-green">
+          <div className="flex items-center gap-4 lg:gap-6">
+            <p className="text-lg lg:text-2xl font-light text-cbc-green">
               {time.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
             </p>
             
@@ -518,9 +658,9 @@ const App: React.FC = () => {
                   <p className="text-sm font-bold text-gray-700 capitalize">{userRole}</p>
                   <p className="text-xs text-gray-500">CBC Solar</p>
                 </div>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white
+                <div className={`w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center text-white
                   ${userRole === 'admin' ? 'bg-purple-600' : 'bg-cbc-green'}`}>
-                  <UserIcon size={20} />
+                  <UserIcon size={18} />
                 </div>
               </div>
             </div>
@@ -532,14 +672,26 @@ const App: React.FC = () => {
 
           {/* Floating Action Button */}
           <button
-            onClick={() => currentView === 'inverter_config' ? openInverterModal() : openSchedulingModal()}
-            className={`absolute bottom-8 right-8 text-white rounded-full p-4 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 z-20 flex items-center gap-2 group
-              ${currentView === 'inverter_config' ? 'bg-blue-600 hover:bg-blue-500' : 'bg-cbc-orange hover:bg-cbc-lightOrange'}`}
-            title={currentView === 'inverter_config' ? "Nova Configuração" : "Novo Agendamento"}
+            onClick={() => 
+              currentView === 'inverter_config' ? openInverterModal() : 
+              currentView === 'installation' ? openInstallationModal() :
+              openSchedulingModal()
+            }
+            className={`absolute bottom-6 right-6 lg:bottom-8 lg:right-8 text-white rounded-full p-4 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200 z-20 flex items-center gap-2 group
+              ${currentView === 'inverter_config' ? 'bg-blue-600 hover:bg-blue-500' : 
+                currentView === 'installation' ? 'bg-yellow-500 hover:bg-yellow-400' :
+                'bg-cbc-orange hover:bg-cbc-lightOrange'}`}
+            title={
+              currentView === 'inverter_config' ? "Nova Configuração" : 
+              currentView === 'installation' ? "Nova Instalação" : 
+              "Novo Agendamento"
+            }
           >
             <Plus size={32} />
-            <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap font-medium pr-2">
-              {currentView === 'inverter_config' ? "Nova Configuração" : "Novo Agendamento"}
+            <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap font-medium pr-2 hidden lg:block">
+              {currentView === 'inverter_config' ? "Nova Configuração" : 
+               currentView === 'installation' ? "Nova Instalação" : 
+               "Novo Agendamento"}
             </span>
           </button>
 
@@ -581,6 +733,16 @@ const App: React.FC = () => {
         availableSalespeople={salespeople}
         availableTeams={teams}
         nextOrderNumber={getNextInverterOrderNumber()}
+      />
+
+      <InstallationModal
+        isOpen={isInstallationModalOpen}
+        onClose={() => setIsInstallationModalOpen(false)}
+        onSave={editingInstallation ? handleUpdateInstallation : handleCreateInstallation}
+        installationToEdit={editingInstallation}
+        availableSalespeople={salespeople}
+        availableTeams={teams}
+        nextOrderNumber={getNextInstallationOrderNumber()}
       />
 
       <DeleteConfirmationModal 

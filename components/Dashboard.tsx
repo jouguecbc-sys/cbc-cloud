@@ -1,33 +1,59 @@
+
 import React, { useState } from 'react';
-import { Scheduling, SchedulingStatus, InverterConfig } from '../types';
-import { Calendar, MapPin, User, CheckCircle, AlertCircle, PlayCircle, Briefcase, FileText, Download, FileSpreadsheet, Settings, Cpu } from 'lucide-react';
+import { Scheduling, SchedulingStatus, InverterConfig, SchedulingPriority } from '../types';
+import { Calendar, MapPin, User, CheckCircle, AlertCircle, PlayCircle, Briefcase, FileText, Download, FileSpreadsheet, Settings, Cpu, AlertTriangle } from 'lucide-react';
 
 interface DashboardProps {
   schedulings: Scheduling[];
   inverterConfigs: InverterConfig[];
   onStatusChange: (id: string, currentStatus: SchedulingStatus) => void;
   onInverterStatusChange: (id: string, currentStatus: SchedulingStatus) => void;
+  onPriorityChange: (id: string, currentPriority: SchedulingPriority) => void;
+  onInverterPriorityChange: (id: string, currentPriority: SchedulingPriority) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ schedulings, inverterConfigs, onStatusChange, onInverterStatusChange }) => {
+const Dashboard: React.FC<DashboardProps> = ({ 
+  schedulings, 
+  inverterConfigs, 
+  onStatusChange, 
+  onInverterStatusChange,
+  onPriorityChange,
+  onInverterPriorityChange
+}) => {
   const [activeTab, setActiveTab] = useState<'scheduling' | 'inverter'>('scheduling');
 
   // --- Sorting Logic ---
   const sortItems = (items: any[]) => {
     return [...items].sort((a, b) => {
-      const statusPriority = {
-        [SchedulingStatus.PENDING]: 0,
-        [SchedulingStatus.IN_PROGRESS]: 1,
-        [SchedulingStatus.RESOLVED]: 2
+      // 1. Separar Resolvidos de Ativos (Resolvidos vão para o final)
+      const isResolvedA = a.status === SchedulingStatus.RESOLVED;
+      const isResolvedB = b.status === SchedulingStatus.RESOLVED;
+
+      if (isResolvedA && !isResolvedB) return 1; // A (resolvido) vai para baixo
+      if (!isResolvedA && isResolvedB) return -1; // B (resolvido) vai para baixo
+
+      // 2. Classificar por Prioridade (URGENTE > ALTA > MÉDIA > BAIXA)
+      const priorityOrder = {
+        [SchedulingPriority.URGENT]: 0,
+        [SchedulingPriority.HIGH]: 1,
+        [SchedulingPriority.MEDIUM]: 2,
+        [SchedulingPriority.LOW]: 3,
+        [undefined as any]: 2
       };
-      
-      if (statusPriority[a.status] !== statusPriority[b.status]) {
-        return statusPriority[a.status] - statusPriority[b.status];
+
+      const pA = priorityOrder[a.priority || SchedulingPriority.MEDIUM];
+      const pB = priorityOrder[b.priority || SchedulingPriority.MEDIUM];
+
+      if (pA !== pB) {
+        return pA - pB; // Menor número (maior prioridade) primeiro
       }
-      
-      const dateA = a.scheduledDate || '9999-99-99';
-      const dateB = b.scheduledDate || '9999-99-99';
-      return dateA.localeCompare(dateB);
+
+      // 3. Ordem de Registro (Fila: 01, 02, 03...) - Crescente
+      // "Primeiros registros no topo"
+      const orderA = parseInt(a.orderNumber) || 0;
+      const orderB = parseInt(b.orderNumber) || 0;
+
+      return orderA - orderB; // Crescente (1, 2, 3...)
     });
   };
 
@@ -36,7 +62,6 @@ const Dashboard: React.FC<DashboardProps> = ({ schedulings, inverterConfigs, onS
 
   // --- Style Logic ---
   const getStatusStyles = (status: SchedulingStatus, type: 'scheduling' | 'inverter') => {
-    // If it's Scheduling, use Green/Red/Orange. If Inverter, use Blue/Red/Orange (Resolved is Blue)
     const isInverter = type === 'inverter';
 
     switch(status) {
@@ -61,7 +86,7 @@ const Dashboard: React.FC<DashboardProps> = ({ schedulings, inverterConfigs, onS
       case SchedulingStatus.RESOLVED: 
         if (isInverter) {
           return { // Blue Theme for Resolved Inverters
-            card: 'bg-blue-100 border-blue-300 shadow-sm hover:shadow-md hover:shadow-blue-200',
+            card: 'bg-blue-100 border-blue-300 shadow-sm hover:shadow-md hover:shadow-blue-200 opacity-60',
             text: 'text-blue-900',
             badge: 'bg-blue-600 text-white border-blue-700 hover:bg-blue-700',
             icon: 'text-blue-700',
@@ -70,13 +95,38 @@ const Dashboard: React.FC<DashboardProps> = ({ schedulings, inverterConfigs, onS
           };
         }
         return { // Green Theme for Resolved Schedulings
-          card: 'bg-green-100 border-green-300 shadow-sm hover:shadow-md hover:shadow-green-200',
+          card: 'bg-green-100 border-green-300 shadow-sm hover:shadow-md hover:shadow-green-200 opacity-60',
           text: 'text-green-900',
           badge: 'bg-green-600 text-white border-green-700 hover:bg-green-700',
           icon: 'text-green-700',
           subtext: 'text-green-800',
           divider: 'border-green-200'
         };
+    }
+  };
+
+  const getPriorityStyles = (priority: SchedulingPriority) => {
+    switch(priority) {
+      case SchedulingPriority.URGENT:
+        return 'bg-red-600 text-white border-red-700 animate-pulse font-black shadow-lg shadow-red-500/30 ring-2 ring-red-400';
+      case SchedulingPriority.HIGH:
+        return 'bg-orange-500 text-white border-orange-600 font-bold hover:bg-orange-600';
+      case SchedulingPriority.MEDIUM:
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300 font-bold hover:bg-yellow-200';
+      case SchedulingPriority.LOW:
+        return 'bg-blue-100 text-blue-800 border-blue-200 font-medium hover:bg-blue-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200 font-medium';
+    }
+  };
+
+  const getPriorityLabel = (priority: SchedulingPriority) => {
+    switch(priority) {
+      case SchedulingPriority.URGENT: return 'URGENTE';
+      case SchedulingPriority.HIGH: return 'ALTA';
+      case SchedulingPriority.MEDIUM: return 'MÉDIA';
+      case SchedulingPriority.LOW: return 'BAIXA';
+      default: return 'NORMAL';
     }
   };
 
@@ -102,9 +152,10 @@ const Dashboard: React.FC<DashboardProps> = ({ schedulings, inverterConfigs, onS
     doc.setFontSize(10);
     doc.text(`Gerado em: ${new Date().toLocaleString()}`, 14, 28);
 
-    const tableColumn = ["Ordem", "Cliente", isInv ? "Modelo" : "Serviço", "Data", "Status"];
+    const tableColumn = ["Ordem", "Prio.", "Cliente", isInv ? "Modelo" : "Serviço", "Data", "Status"];
     const tableRows = data.map(item => [
       item.orderNumber,
+      getPriorityLabel(item.priority || SchedulingPriority.MEDIUM),
       item.client,
       isInv ? (item as InverterConfig).inverterModel : (item as Scheduling).service,
       formatDateFull(item.scheduledDate),
@@ -134,7 +185,7 @@ const Dashboard: React.FC<DashboardProps> = ({ schedulings, inverterConfigs, onS
     content += "================================================\n\n";
 
     data.forEach(item => {
-      content += `ORDEM #${item.orderNumber} - ${item.status.toUpperCase()}\n`;
+      content += `ORDEM #${item.orderNumber} [${getPriorityLabel(item.priority || SchedulingPriority.MEDIUM)}] - ${item.status.toUpperCase()}\n`;
       content += `CLIENTE: ${item.client}\n`;
       content += isInv ? `MODELO:  ${(item as InverterConfig).inverterModel}\n` : `SERVIÇO: ${(item as Scheduling).service}\n`;
       content += `DATA:    ${formatDateFull(item.scheduledDate)}\n`;
@@ -159,6 +210,7 @@ const Dashboard: React.FC<DashboardProps> = ({ schedulings, inverterConfigs, onS
 
     const ws = XLSX.utils.json_to_sheet(data.map(item => ({
       Ordem: item.orderNumber,
+      Prioridade: getPriorityLabel(item.priority || SchedulingPriority.MEDIUM),
       Status: item.status,
       Cliente: item.client,
       [isInv ? "Modelo" : "Servico"]: isInv ? (item as InverterConfig).inverterModel : (item as Scheduling).service,
@@ -189,7 +241,9 @@ const Dashboard: React.FC<DashboardProps> = ({ schedulings, inverterConfigs, onS
      return items.map(item => {
         const styles = getStatusStyles(item.status, type);
         const itemDesc = type === 'inverter' ? (item as InverterConfig).inverterModel : (item as Scheduling).service;
-        
+        const priority = item.priority || SchedulingPriority.MEDIUM;
+        const prioStyle = getPriorityStyles(priority);
+
         return (
           <div key={item.id} className={`rounded-xl p-0 shadow-lg border-l-8 transition-all duration-300 hover:translate-x-1 ${styles.card} flex flex-col lg:flex-row items-stretch lg:items-center relative overflow-hidden mb-4`}>
              
@@ -198,10 +252,24 @@ const Dashboard: React.FC<DashboardProps> = ({ schedulings, inverterConfigs, onS
                 {item.status === SchedulingStatus.RESOLVED ? <CheckCircle size={100} /> : item.status === SchedulingStatus.IN_PROGRESS ? <PlayCircle size={100} /> : <AlertCircle size={100} />}
              </div>
 
-             {/* Left: Order # */}
-             <div className={`p-4 lg:w-32 flex flex-col items-center justify-center border-b lg:border-b-0 lg:border-r ${styles.divider} shrink-0 bg-white/20`}>
-               <span className={`text-xs font-black uppercase tracking-widest opacity-70 ${styles.text}`}>Ordem</span>
-               <span className={`text-5xl font-black leading-none ${styles.text}`}>#{item.orderNumber}</span>
+             {/* Left: Order # & Priority */}
+             <div className={`p-4 lg:w-36 flex flex-col items-center justify-center border-b lg:border-b-0 lg:border-r ${styles.divider} shrink-0 bg-white/20 relative`}>
+               
+               <span className={`text-5xl font-black leading-none mb-3 ${styles.text}`}>#{item.orderNumber}</span>
+
+               {/* Priority Badge (Clickable) */}
+               <button 
+                 onClick={(e) => {
+                   e.stopPropagation();
+                   type === 'inverter' 
+                     ? onInverterPriorityChange(item.id, priority)
+                     : onPriorityChange(item.id, priority);
+                 }}
+                 className={`px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider border w-full text-center transition-all transform active:scale-95 shadow-sm hover:shadow-md cursor-pointer ${prioStyle}`}
+                 title="Clique para alterar prioridade"
+               >
+                 {getPriorityLabel(priority)}
+               </button>
              </div>
 
              {/* Middle: Details */}
