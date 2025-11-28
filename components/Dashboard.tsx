@@ -251,7 +251,7 @@ const Dashboard: React.FC<DashboardProps> = ({ schedulings, inverterConfigs, onS
   };
 
   return (
-    <div className="p-6 h-full overflow-y-auto bg-gray-100 flex flex-col">
+    <div className="p-6 h-full overflow-y-auto bg-green-50 flex flex-col">
       {/* Header & Tabs */}
       <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4 shrink-0 bg-white p-4 rounded-2xl shadow-sm border border-gray-200">
         

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { InverterConfig, SchedulingStatus } from '../types';
 import { Search, Filter, Trash2, Edit2, Calendar, MapPin, CheckCircle, Clock, User, FileText, FileSpreadsheet, Image as ImageIcon, Briefcase, PlayCircle, AlertCircle, Share2, Printer, Camera, Phone, Settings, Cpu } from 'lucide-react';
@@ -292,7 +291,7 @@ const InverterConfigList: React.FC<InverterConfigListProps> = ({ configs, onEdit
   };
 
   return (
-    <div className="p-8 h-full flex flex-col bg-white">
+    <div className="p-8 h-full flex flex-col bg-green-50">
       {/* Header and Controls */}
       <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 shrink-0 gap-6">
         <div>

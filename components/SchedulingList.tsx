@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Scheduling, SchedulingStatus } from '../types';
 import { Search, Filter, Trash2, Edit2, Calendar, MapPin, CheckCircle, Clock, User, FileText, Download, FileSpreadsheet, Image as ImageIcon, Briefcase, PlayCircle, AlertCircle, Share2, Printer, Camera, Copy, Phone } from 'lucide-react';
@@ -294,7 +293,7 @@ const SchedulingList: React.FC<SchedulingListProps> = ({ schedulings, onEdit, on
   };
 
   return (
-    <div className="p-8 h-full flex flex-col bg-white">
+    <div className="p-8 h-full flex flex-col bg-green-50">
       {/* Header and Controls */}
       <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 shrink-0 gap-6">
         <div>

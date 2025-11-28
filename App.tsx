@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Plus, Bell, User as UserIcon, Trash2, Briefcase, User, Users, Calendar, Settings, Loader2 } from 'lucide-react';
 import Sidebar from './components/Sidebar';
@@ -479,7 +478,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="flex h-screen w-screen bg-gray-50 overflow-hidden font-sans">
+    <div className="flex h-screen w-screen bg-green-50 overflow-hidden font-sans">
       <Sidebar 
         currentView={currentView} 
         onChangeView={setCurrentView} 
