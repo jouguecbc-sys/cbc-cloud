@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Scheduling, SchedulingStatus, SchedulingPriority } from '../types';
 import { X, Save, Plus, Calendar, MapPin, User, FileText, Briefcase, Phone, AlertTriangle } from 'lucide-react';

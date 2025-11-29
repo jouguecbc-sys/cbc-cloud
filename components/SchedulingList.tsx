@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Scheduling, SchedulingStatus, SchedulingPriority } from '../types';
 import { Search, Filter, Trash2, Edit2, Calendar, MapPin, CheckCircle, Clock, User, FileText, Download, FileSpreadsheet, Image as ImageIcon, Briefcase, PlayCircle, AlertCircle, Share2, Printer, Camera, Copy, Phone } from 'lucide-react';

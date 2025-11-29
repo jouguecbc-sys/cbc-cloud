@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Plus, Bell, User as UserIcon, Trash2, Briefcase, User, Users, Calendar, Settings, Loader2, Wrench, Menu } from 'lucide-react';
 import Sidebar from './components/Sidebar';
