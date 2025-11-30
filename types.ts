@@ -105,6 +105,7 @@ export interface Installation {
   observation: string;
 }
 
+<<<<<<< HEAD
 // Novo tipo para Clientes
 export interface Client {
   id: string;
@@ -140,13 +141,19 @@ export interface Reminder {
   created_at?: string;
 }
 
+=======
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 export interface StatisticsData {
   name: string;
   value: number;
   fill: string;
 }
 
+<<<<<<< HEAD
 export type ViewMode = 'dashboard' | 'scheduling' | 'inverter_config' | 'installation' | 'refund' | 'reminder' | 'clients' | TaskCategory;
+=======
+export type ViewMode = 'dashboard' | 'scheduling' | 'inverter_config' | 'installation' | TaskCategory;
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 
 // --- AUTH TYPES ---
 export type UserRole = 'admin' | 'user';

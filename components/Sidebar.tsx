@@ -1,6 +1,10 @@
 
 import React from 'react';
+<<<<<<< HEAD
 import { Database, Sun, LayoutDashboard, Settings, LogOut, Users, Key, Wrench, CalendarRange, X, ChevronRight, ShieldCheck, DollarSign, StickyNote, UserCheck } from 'lucide-react';
+=======
+import { Database, Sun, LayoutDashboard, Settings, LogOut, Users, Key, Wrench, CalendarRange, X, ChevronRight, ShieldCheck } from 'lucide-react';
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 import { ViewMode, UserRole } from '../types';
 
 interface SidebarProps {
@@ -118,6 +122,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               <NavItem view="scheduling" icon={CalendarRange} label="Agendamentos" activeColorClass="text-green-400" />
               <NavItem view="installation" icon={Wrench} label="Gestão de Instalações" activeColorClass="text-yellow-400" />
               <NavItem view="inverter_config" icon={Settings} label="Config. Inversores" activeColorClass="text-blue-400" />
+<<<<<<< HEAD
               <NavItem view="reminder" icon={StickyNote} label="Lembretes" activeColorClass="text-pink-400" />
             </div>
           </div>
@@ -130,6 +135,8 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className="space-y-0.5">
               <NavItem view="clients" icon={UserCheck} label="Clientes" activeColorClass="text-indigo-400" />
               <NavItem view="refund" icon={DollarSign} label="Reembolso de Equipe" activeColorClass="text-emerald-400" />
+=======
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
             </div>
           </div>
 

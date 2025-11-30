@@ -1,6 +1,10 @@
 
 import { supabase } from './supabase';
+<<<<<<< HEAD
 import { Task, Scheduling, InverterConfig, Installation, Refund, Reminder, AppUser, UserRole, Client } from '../types';
+=======
+import { Task, Scheduling, InverterConfig, Installation, AppUser, UserRole } from '../types';
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 
 // Check if Supabase is properly configured to avoid errors in demo mode
 // @ts-ignore
@@ -38,8 +42,12 @@ export const authLogin = async (username: string, pass: string): Promise<{ succe
     if (error) {
       console.error('Login error (DB):', JSON.stringify(error, null, 2));
       if (error.code === 'PGRST116') return { success: false, error: 'Usuário não encontrado.' };
+<<<<<<< HEAD
       if (error.code === 'PGRST205') return { success: false, error: 'Tabela de usuários não encontrada. Execute o script SQL.' };
       return { success: false, error: 'Erro de conexão com banco de dados.' };
+=======
+      return { success: false, error: 'Erro de conexão com banco de dados. Verifique a internet ou as tabelas.' };
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
     }
 
     if (!data) {
@@ -107,6 +115,7 @@ export const deleteUser = async (id: string): Promise<void> => {
 };
 
 
+<<<<<<< HEAD
 // --- CLIENTS (Supabase: clients) ---
 
 export const getClients = async (): Promise<Client[]> => {
@@ -164,6 +173,8 @@ export const deleteClient = async (id: string): Promise<void> => {
 };
 
 
+=======
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 // --- SCHEDULINGS (Supabase: schedulings) ---
 
 export const getSchedulings = async (): Promise<Scheduling[]> => {
@@ -171,7 +182,11 @@ export const getSchedulings = async (): Promise<Scheduling[]> => {
   const { data, error } = await supabase
     .from('schedulings')
     .select('*')
+<<<<<<< HEAD
     .order('orderNumber', { ascending: false });
+=======
+    .order('orderNumber', { ascending: false }); // Ensure sorting by orderNumber string usually works if padded
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 
   if (error) {
     console.error('Supabase error fetch schedulings:', JSON.stringify(error, null, 2));
@@ -183,9 +198,25 @@ export const getSchedulings = async (): Promise<Scheduling[]> => {
 export const saveScheduling = async (scheduling: Scheduling): Promise<void> => {
   if (!isSupabaseConfigured) return;
   
+<<<<<<< HEAD
   const { ...payload } = scheduling;
   const { error } = await supabase.from('schedulings').upsert(payload);
   if (error) console.error('Error saving scheduling:', JSON.stringify(error, null, 2));
+=======
+  // Create a clean payload removing any UI-only props if they exist
+  const { ...payload } = scheduling;
+  
+  // Check existence
+  const { data } = await supabase.from('schedulings').select('id').eq('id', scheduling.id).single();
+  
+  if (data) {
+    const { error } = await supabase.from('schedulings').update(payload).eq('id', scheduling.id);
+    if (error) console.error('Error updating scheduling:', JSON.stringify(error, null, 2));
+  } else {
+    const { error } = await supabase.from('schedulings').insert(payload);
+    if (error) console.error('Error inserting scheduling:', JSON.stringify(error, null, 2));
+  }
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 };
 
 export const saveSchedulings = async (schedulings: Scheduling[]): Promise<void> => {
@@ -219,9 +250,24 @@ export const getInverterConfigs = async (): Promise<InverterConfig[]> => {
 
 export const saveInverterConfig = async (config: InverterConfig): Promise<void> => {
   if (!isSupabaseConfigured) return;
+<<<<<<< HEAD
   const { ...payload } = config;
   const { error } = await supabase.from('inverter_configs').upsert(payload);
   if (error) console.error('Error saving inverter:', JSON.stringify(error, null, 2));
+=======
+  
+  const { ...payload } = config;
+
+  const { data } = await supabase.from('inverter_configs').select('id').eq('id', config.id).single();
+  
+  if (data) {
+    const { error } = await supabase.from('inverter_configs').update(payload).eq('id', config.id);
+    if (error) console.error('Error updating inverter:', JSON.stringify(error, null, 2));
+  } else {
+    const { error } = await supabase.from('inverter_configs').insert(payload);
+    if (error) console.error('Error inserting inverter:', JSON.stringify(error, null, 2));
+  }
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 };
 
 export const deleteInverterConfig = async (id: string): Promise<void> => {
@@ -248,9 +294,24 @@ export const getInstallations = async (): Promise<Installation[]> => {
 
 export const saveInstallation = async (install: Installation): Promise<void> => {
   if (!isSupabaseConfigured) return;
+<<<<<<< HEAD
   const { ...payload } = install;
   const { error } = await supabase.from('installations').upsert(payload);
   if (error) console.error('Error saving installation:', JSON.stringify(error, null, 2));
+=======
+  
+  const { ...payload } = install;
+
+  const { data } = await supabase.from('installations').select('id').eq('id', install.id).single();
+  
+  if (data) {
+    const { error } = await supabase.from('installations').update(payload).eq('id', install.id);
+    if (error) console.error('Error updating installation:', JSON.stringify(error, null, 2));
+  } else {
+    const { error } = await supabase.from('installations').insert(payload);
+    if (error) console.error('Error inserting installation:', JSON.stringify(error, null, 2));
+  }
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 };
 
 export const deleteInstallation = async (id: string): Promise<void> => {
@@ -259,6 +320,7 @@ export const deleteInstallation = async (id: string): Promise<void> => {
   if (error) console.error('Error deleting installation:', JSON.stringify(error, null, 2));
 };
 
+<<<<<<< HEAD
 // --- REFUNDS (Supabase: refunds) ---
 
 export const getRefunds = async (): Promise<Refund[]> => {
@@ -327,6 +389,8 @@ export const deleteReminder = async (id: string): Promise<void> => {
   if (error) console.error('Error deleting reminder:', JSON.stringify(error, null, 2));
 };
 
+=======
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 
 // --- LISTS (Settings Table in Supabase: app_settings { key, value }) ---
 
@@ -334,7 +398,18 @@ const getListFromSupabase = async (key: string, defaultList: string[]): Promise<
   if (!isSupabaseConfigured) return defaultList;
   try {
     const { data, error } = await supabase.from('app_settings').select('value').eq('key', key).single();
+<<<<<<< HEAD
     if (error) return defaultList;
+=======
+    
+    if (error) {
+      // If error is row not found (PGRST116), just return default, don't log as error
+      if (error.code !== 'PGRST116') {
+         console.error(`Error fetching list ${key}:`, JSON.stringify(error, null, 2));
+      }
+      return defaultList;
+    }
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
     return data?.value as string[] || defaultList;
   } catch (err) {
     console.error(`Unexpected error fetching list ${key}:`, err);

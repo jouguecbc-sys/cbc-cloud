@@ -1,11 +1,17 @@
 
 import React, { useState } from 'react';
+<<<<<<< HEAD
 import { Scheduling, SchedulingStatus, InverterConfig, SchedulingPriority, Installation } from '../types';
 import { Calendar, MapPin, User, CheckCircle, AlertCircle, PlayCircle, Briefcase, FileText, Download, FileSpreadsheet, Settings, Cpu, Zap, Wrench } from 'lucide-react';
+=======
+import { Scheduling, SchedulingStatus, InverterConfig, SchedulingPriority } from '../types';
+import { Calendar, MapPin, User, CheckCircle, AlertCircle, PlayCircle, Briefcase, FileText, Download, FileSpreadsheet, Settings, Cpu, AlertTriangle } from 'lucide-react';
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 
 interface DashboardProps {
   schedulings: Scheduling[];
   inverterConfigs: InverterConfig[];
+<<<<<<< HEAD
   installations: Installation[];
   onStatusChange: (id: string, currentStatus: SchedulingStatus) => void;
   onInverterStatusChange: (id: string, currentStatus: SchedulingStatus) => void;
@@ -13,11 +19,18 @@ interface DashboardProps {
   onPriorityChange: (id: string, currentPriority: SchedulingPriority) => void;
   onInverterPriorityChange: (id: string, currentPriority: SchedulingPriority) => void;
   onInstallationPriorityChange: (id: string, currentPriority: SchedulingPriority) => void;
+=======
+  onStatusChange: (id: string, currentStatus: SchedulingStatus) => void;
+  onInverterStatusChange: (id: string, currentStatus: SchedulingStatus) => void;
+  onPriorityChange: (id: string, currentPriority: SchedulingPriority) => void;
+  onInverterPriorityChange: (id: string, currentPriority: SchedulingPriority) => void;
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ 
   schedulings, 
   inverterConfigs, 
+<<<<<<< HEAD
   installations,
   onStatusChange, 
   onInverterStatusChange,
@@ -27,6 +40,14 @@ const Dashboard: React.FC<DashboardProps> = ({
   onInstallationPriorityChange
 }) => {
   const [activeTab, setActiveTab] = useState<'scheduling' | 'inverter' | 'installation'>('scheduling');
+=======
+  onStatusChange, 
+  onInverterStatusChange,
+  onPriorityChange,
+  onInverterPriorityChange
+}) => {
+  const [activeTab, setActiveTab] = useState<'scheduling' | 'inverter'>('scheduling');
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 
   // --- Sorting Logic ---
   const sortItems = (items: any[]) => {
@@ -65,11 +86,19 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   const sortedSchedulings = sortItems(schedulings);
   const sortedInverters = sortItems(inverterConfigs);
+<<<<<<< HEAD
   const sortedInstallations = sortItems(installations);
 
   // --- Style Logic ---
   const getStatusStyles = (status: SchedulingStatus, type: 'scheduling' | 'inverter' | 'installation') => {
     
+=======
+
+  // --- Style Logic ---
+  const getStatusStyles = (status: SchedulingStatus, type: 'scheduling' | 'inverter') => {
+    const isInverter = type === 'inverter';
+
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
     switch(status) {
       case SchedulingStatus.PENDING: 
         return {
@@ -90,7 +119,11 @@ const Dashboard: React.FC<DashboardProps> = ({
           divider: 'border-orange-200'
         };
       case SchedulingStatus.RESOLVED: 
+<<<<<<< HEAD
         if (type === 'inverter') {
+=======
+        if (isInverter) {
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
           return { // Blue Theme for Resolved Inverters
             card: 'bg-blue-100 border-blue-300 shadow-sm hover:shadow-md hover:shadow-blue-200 opacity-60',
             text: 'text-blue-900',
@@ -99,6 +132,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             subtext: 'text-blue-800',
             divider: 'border-blue-200'
           };
+<<<<<<< HEAD
         } else if (type === 'installation') {
           return { // Yellow Theme for Resolved Installations
             card: 'bg-yellow-100 border-yellow-300 shadow-sm hover:shadow-md hover:shadow-yellow-200 opacity-60',
@@ -108,6 +142,8 @@ const Dashboard: React.FC<DashboardProps> = ({
             subtext: 'text-yellow-800',
             divider: 'border-yellow-200'
           };
+=======
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
         }
         return { // Green Theme for Resolved Schedulings
           card: 'bg-green-100 border-green-300 shadow-sm hover:shadow-md hover:shadow-green-200 opacity-60',
@@ -158,6 +194,7 @@ const Dashboard: React.FC<DashboardProps> = ({
     // @ts-ignore
     const doc = new window.jspdf.jsPDF();
     
+<<<<<<< HEAD
     let title = '';
     let data: any[] = [];
     let headers: any[] = [];
@@ -179,12 +216,18 @@ const Dashboard: React.FC<DashboardProps> = ({
       headers = ["Ordem", "Prio.", "Cliente", "Sistema", "Agendada", "Status"];
       headColor = [234, 179, 8];
     }
+=======
+    const isInv = activeTab === 'inverter';
+    const title = isInv ? 'Monitor de Inversores' : 'Monitor de Agendamentos';
+    const data = isInv ? sortedInverters : sortedSchedulings;
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 
     doc.setFontSize(22);
     doc.text(`${title} - CBC Solar`, 14, 22);
     doc.setFontSize(10);
     doc.text(`Gerado em: ${new Date().toLocaleString()}`, 14, 28);
 
+<<<<<<< HEAD
     const tableRows = data.map(item => {
       let desc = '';
       if (activeTab === 'scheduling') desc = item.service;
@@ -219,12 +262,32 @@ const Dashboard: React.FC<DashboardProps> = ({
       startY: 35,
       theme: 'grid',
       headStyles: { fillColor: headColor }
+=======
+    const tableColumn = ["Ordem", "Prio.", "Cliente", isInv ? "Modelo" : "Serviço", "Data", "Status"];
+    const tableRows = data.map(item => [
+      item.orderNumber,
+      getPriorityLabel(item.priority || SchedulingPriority.MEDIUM),
+      item.client,
+      isInv ? (item as InverterConfig).inverterModel : (item as Scheduling).service,
+      formatDateFull(item.scheduledDate),
+      item.status === SchedulingStatus.RESOLVED ? (isInv ? 'Configurado' : 'Resolvido') : item.status === SchedulingStatus.IN_PROGRESS ? 'Andamento' : 'Pendente'
+    ]);
+
+    // @ts-ignore
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 35,
+      theme: 'grid',
+      headStyles: { fillColor: isInv ? [59, 130, 246] : [46, 139, 87] }
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
     });
 
     doc.save(`dashboard_${activeTab}_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   const handleExportTXT = () => {
+<<<<<<< HEAD
     let data: any[] = [];
     let title = '';
 
@@ -238,6 +301,11 @@ const Dashboard: React.FC<DashboardProps> = ({
       data = sortedInstallations;
       title = 'MONITOR DE INSTALAÇÕES';
     }
+=======
+    const isInv = activeTab === 'inverter';
+    const data = isInv ? sortedInverters : sortedSchedulings;
+    const title = isInv ? 'MONITOR DE INVERSORES' : 'MONITOR DE AGENDAMENTOS';
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 
     let content = "================================================\n";
     content += `           ${title}              \n`;
@@ -247,11 +315,15 @@ const Dashboard: React.FC<DashboardProps> = ({
     data.forEach(item => {
       content += `ORDEM #${item.orderNumber} [${getPriorityLabel(item.priority || SchedulingPriority.MEDIUM)}] - ${item.status.toUpperCase()}\n`;
       content += `CLIENTE: ${item.client}\n`;
+<<<<<<< HEAD
       
       if (activeTab === 'scheduling') content += `SERVIÇO: ${(item as Scheduling).service}\n`;
       else if (activeTab === 'inverter') content += `MODELO:  ${(item as InverterConfig).inverterModel}\n`;
       else content += `SISTEMA: ${(item as Installation).kwp} kWp (${(item as Installation).panelQuantity} Placas)\n`;
 
+=======
+      content += isInv ? `MODELO:  ${(item as InverterConfig).inverterModel}\n` : `SERVIÇO: ${(item as Scheduling).service}\n`;
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
       content += `DATA:    ${formatDateFull(item.scheduledDate)}\n`;
       content += "------------------------------------------------\n";
     });
@@ -269,18 +341,29 @@ const Dashboard: React.FC<DashboardProps> = ({
     const XLSX = (window as any).XLSX;
     if (!XLSX) { alert('Biblioteca Excel carregando...'); return; }
     
+<<<<<<< HEAD
     let data: any[] = [];
     if (activeTab === 'scheduling') data = sortedSchedulings;
     else if (activeTab === 'inverter') data = sortedInverters;
     else data = sortedInstallations;
+=======
+    const isInv = activeTab === 'inverter';
+    const data = isInv ? sortedInverters : sortedSchedulings;
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 
     const ws = XLSX.utils.json_to_sheet(data.map(item => ({
       Ordem: item.orderNumber,
       Prioridade: getPriorityLabel(item.priority || SchedulingPriority.MEDIUM),
       Status: item.status,
       Cliente: item.client,
+<<<<<<< HEAD
       Descricao: activeTab === 'scheduling' ? (item as Scheduling).service : activeTab === 'inverter' ? (item as InverterConfig).inverterModel : `${(item as Installation).kwp} kWp`,
       Data: formatDateFull(item.scheduledDate),
+=======
+      [isInv ? "Modelo" : "Servico"]: isInv ? (item as InverterConfig).inverterModel : (item as Scheduling).service,
+      Data: formatDateFull(item.scheduledDate),
+      Hora: item.scheduledTime,
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
       Equipe: item.team,
       Vendedor: item.salesperson
     })));
@@ -291,14 +374,22 @@ const Dashboard: React.FC<DashboardProps> = ({
   };
 
   // --- Render List Helper ---
+<<<<<<< HEAD
   const renderList = (items: any[], type: 'scheduling' | 'inverter' | 'installation') => {
+=======
+  const renderList = (items: any[], type: 'scheduling' | 'inverter') => {
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
      if (items.length === 0) {
         return (
            <div className="flex flex-col items-center justify-center py-32 text-gray-400">
               <div className="bg-white p-8 rounded-full mb-6 shadow-sm">
+<<<<<<< HEAD
                 {type === 'inverter' ? <Settings size={80} className="text-gray-300" /> : 
                  type === 'installation' ? <Wrench size={80} className="text-gray-300" /> : 
                  <Calendar size={80} className="text-gray-300" />}
+=======
+                {type === 'inverter' ? <Settings size={80} className="text-gray-300" /> : <Calendar size={80} className="text-gray-300" />}
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
               </div>
               <p className="text-4xl font-bold mb-2 text-gray-300">Sem Itens na Fila</p>
            </div>
@@ -307,6 +398,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
      return items.map(item => {
         const styles = getStatusStyles(item.status, type);
+<<<<<<< HEAD
         const priority = item.priority || SchedulingPriority.MEDIUM;
         const prioStyle = getPriorityStyles(priority);
         
@@ -342,6 +434,11 @@ const Dashboard: React.FC<DashboardProps> = ({
            : item.status === SchedulingStatus.IN_PROGRESS 
            ? 'ANDAMENTO' 
            : 'PENDENTE';
+=======
+        const itemDesc = type === 'inverter' ? (item as InverterConfig).inverterModel : (item as Scheduling).service;
+        const priority = item.priority || SchedulingPriority.MEDIUM;
+        const prioStyle = getPriorityStyles(priority);
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 
         return (
           <div key={item.id} className={`rounded-xl p-0 shadow-lg border-l-8 transition-all duration-300 hover:translate-x-1 ${styles.card} flex flex-col lg:flex-row items-stretch lg:items-center relative overflow-hidden mb-4`}>
@@ -358,7 +455,16 @@ const Dashboard: React.FC<DashboardProps> = ({
 
                {/* Priority Badge (Clickable) */}
                <button 
+<<<<<<< HEAD
                  onClick={handlePriorityClick}
+=======
+                 onClick={(e) => {
+                   e.stopPropagation();
+                   type === 'inverter' 
+                     ? onInverterPriorityChange(item.id, priority)
+                     : onPriorityChange(item.id, priority);
+                 }}
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
                  className={`px-3 py-1.5 rounded-lg text-[10px] uppercase tracking-wider border w-full text-center transition-all transform active:scale-95 shadow-sm hover:shadow-md cursor-pointer ${prioStyle}`}
                  title="Clique para alterar prioridade"
                >
@@ -376,8 +482,13 @@ const Dashboard: React.FC<DashboardProps> = ({
                 
                 <div className="flex flex-wrap gap-x-6 gap-y-2">
                     <div className={`flex items-center gap-2 text-lg font-bold ${styles.subtext}`}>
+<<<<<<< HEAD
                       {icon}
                       {mainDesc}
+=======
+                      {type === 'inverter' ? <Cpu size={20} /> : <Briefcase size={20} />}
+                      {itemDesc}
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
                     </div>
                     <div className={`flex items-center gap-2 text-base font-bold opacity-80 ${styles.subtext}`}>
                       <MapPin size={18} />
@@ -400,10 +511,17 @@ const Dashboard: React.FC<DashboardProps> = ({
                 </div>
 
                 <button 
+<<<<<<< HEAD
                    onClick={handleStatusClick}
                    className={`w-full lg:w-auto px-6 py-2 rounded-lg font-black text-sm uppercase tracking-widest shadow-md transform active:scale-95 transition-all ${styles.badge}`}
                  >
                    {statusLabel}
+=======
+                   onClick={() => type === 'inverter' ? onInverterStatusChange(item.id, item.status) : onStatusChange(item.id, item.status)}
+                   className={`w-full lg:w-auto px-6 py-2 rounded-lg font-black text-sm uppercase tracking-widest shadow-md transform active:scale-95 transition-all ${styles.badge}`}
+                 >
+                   {item.status === SchedulingStatus.RESOLVED ? (type === 'inverter' ? 'CONFIGURADO' : 'RESOLVIDO') : item.status === SchedulingStatus.IN_PROGRESS ? 'ANDAMENTO' : 'PENDENTE'}
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
                 </button>
              </div>
 
@@ -418,6 +536,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4 shrink-0 bg-white p-4 rounded-2xl shadow-sm border border-gray-200">
         
         {/* TAB SWITCHER */}
+<<<<<<< HEAD
         <div className="flex p-1 bg-gray-100 rounded-xl overflow-x-auto max-w-full">
            <button 
              onClick={() => setActiveTab('scheduling')}
@@ -436,6 +555,20 @@ const Dashboard: React.FC<DashboardProps> = ({
              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all whitespace-nowrap ${activeTab === 'inverter' ? 'bg-white text-blue-600 shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
            >
              <Settings size={20} /> Fila Inversores
+=======
+        <div className="flex p-1 bg-gray-100 rounded-xl">
+           <button 
+             onClick={() => setActiveTab('scheduling')}
+             className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all ${activeTab === 'scheduling' ? 'bg-white text-cbc-green shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
+           >
+             <Briefcase size={20} /> Fila de Agendamentos
+           </button>
+           <button 
+             onClick={() => setActiveTab('inverter')}
+             className={`flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all ${activeTab === 'inverter' ? 'bg-white text-blue-600 shadow-md' : 'text-gray-500 hover:text-gray-700'}`}
+           >
+             <Settings size={20} /> Fila de Inversores
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
            </button>
         </div>
 
@@ -456,8 +589,11 @@ const Dashboard: React.FC<DashboardProps> = ({
       <div className="flex flex-col gap-4 pb-20">
          {activeTab === 'scheduling' 
             ? renderList(sortedSchedulings, 'scheduling') 
+<<<<<<< HEAD
             : activeTab === 'installation'
             ? renderList(sortedInstallations, 'installation')
+=======
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
             : renderList(sortedInverters, 'inverter')
          }
       </div>

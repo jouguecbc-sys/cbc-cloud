@@ -1,7 +1,12 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 import React, { useState, useEffect } from 'react';
 import { InverterConfig, SchedulingStatus, SchedulingPriority } from '../types';
 import { X, Save, Plus, Calendar, MapPin, User, FileText, Briefcase, Phone, Settings, AlertTriangle } from 'lucide-react';
 
+<<<<<<< HEAD
 interface ClientData {
     name: string;
     phone: string;
@@ -9,6 +14,8 @@ interface ClientData {
     salesperson: string;
 }
 
+=======
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 interface InverterConfigModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -18,7 +25,10 @@ interface InverterConfigModalProps {
   availableSalespeople: string[];
   availableTeams: string[];
   nextOrderNumber: string;
+<<<<<<< HEAD
   knownClients?: ClientData[];
+=======
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 }
 
 const InverterConfigModal: React.FC<InverterConfigModalProps> = ({ 
@@ -29,8 +39,12 @@ const InverterConfigModal: React.FC<InverterConfigModalProps> = ({
   availableModels,
   availableSalespeople,
   availableTeams,
+<<<<<<< HEAD
   nextOrderNumber,
   knownClients = []
+=======
+  nextOrderNumber 
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 }) => {
   const initialFormState = {
     client: '',
@@ -50,10 +64,13 @@ const InverterConfigModal: React.FC<InverterConfigModalProps> = ({
 
   const [formData, setFormData] = useState(initialFormState);
   
+<<<<<<< HEAD
   // Autocomplete State
   const [showClientSuggestions, setShowClientSuggestions] = useState(false);
   const [filteredClients, setFilteredClients] = useState<ClientData[]>([]);
 
+=======
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
   // States for adding new items dynamically
   const [isAddingModel, setIsAddingModel] = useState(false);
   const [newModelName, setNewModelName] = useState('');
@@ -80,6 +97,7 @@ const InverterConfigModal: React.FC<InverterConfigModalProps> = ({
     setIsAddingModel(false); setNewModelName('');
     setIsAddingSalesperson(false); setNewSalespersonName('');
     setIsAddingTeam(false); setNewTeamName('');
+<<<<<<< HEAD
     setShowClientSuggestions(false);
   }, [configToEdit, isOpen]);
 
@@ -108,6 +126,10 @@ const InverterConfigModal: React.FC<InverterConfigModalProps> = ({
       setShowClientSuggestions(false);
   };
 
+=======
+  }, [configToEdit, isOpen]);
+
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
   // Handle status change to auto-set completion date
   const handleStatusChange = (status: SchedulingStatus) => {
     let completion = formData.completionDate;
@@ -180,7 +202,11 @@ const InverterConfigModal: React.FC<InverterConfigModalProps> = ({
       {!isAdding ? (
         <div className="flex gap-2">
           <select
+<<<<<<< HEAD
             className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white text-gray-900 shadow-sm"
+=======
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cbc-green outline-none bg-white text-gray-900 shadow-sm"
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
             value={value}
             onChange={e => onChange(e.target.value)}
           >
@@ -192,7 +218,11 @@ const InverterConfigModal: React.FC<InverterConfigModalProps> = ({
           <button 
             type="button"
             onClick={() => setIsAdding(true)}
+<<<<<<< HEAD
             className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-sm"
+=======
+            className="p-2 bg-cbc-green text-white rounded-lg hover:bg-cbc-lightGreen transition-colors shadow-sm"
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
             title={`Adicionar ${label}`}
           >
             <Plus size={20} />
@@ -202,7 +232,11 @@ const InverterConfigModal: React.FC<InverterConfigModalProps> = ({
         <div className="flex gap-2 animate-in fade-in slide-in-from-left-2 duration-200">
           <input
             type="text"
+<<<<<<< HEAD
             className="flex-1 px-4 py-2 border border-blue-500 ring-1 ring-blue-500 rounded-lg focus:outline-none bg-white text-gray-900 placeholder:text-gray-400 shadow-sm"
+=======
+            className="flex-1 px-4 py-2 border border-cbc-green ring-1 ring-cbc-green rounded-lg focus:outline-none bg-white text-gray-900 placeholder:text-gray-400 shadow-sm"
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
             placeholder={placeholderNew}
             value={newValue}
             onChange={e => setNewValue(e.target.value)}
@@ -245,18 +279,27 @@ const InverterConfigModal: React.FC<InverterConfigModalProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* Coluna 1: Informações do Cliente e Local */}
+<<<<<<< HEAD
             <div className="space-y-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm relative">
+=======
+            <div className="space-y-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
               <h3 className="font-semibold text-gray-700 border-b pb-2 mb-3 flex items-center gap-2">
                 <User size={18} className="text-blue-500"/> Dados do Cliente
               </h3>
               
+<<<<<<< HEAD
               <div className="relative">
+=======
+              <div>
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
                 <label className="block text-sm font-medium text-gray-600 mb-1">Cliente</label>
                 <input
                   type="text"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white text-gray-900 shadow-sm"
                   placeholder="Nome do Cliente"
                   value={formData.client}
+<<<<<<< HEAD
                   onChange={handleClientChange}
                   onBlur={() => setTimeout(() => setShowClientSuggestions(false), 200)}
                 />
@@ -276,6 +319,10 @@ const InverterConfigModal: React.FC<InverterConfigModalProps> = ({
                         ))}
                     </ul>
                 )}
+=======
+                  onChange={e => setFormData({ ...formData, client: e.target.value })}
+                />
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
               </div>
 
               <div>
@@ -467,4 +514,8 @@ const InverterConfigModal: React.FC<InverterConfigModalProps> = ({
   );
 };
 
+<<<<<<< HEAD
 export default InverterConfigModal;
+=======
+export default InverterConfigModal;
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8

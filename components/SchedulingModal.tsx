@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from 'react';
 import { Scheduling, SchedulingStatus, SchedulingPriority } from '../types';
 import { X, Save, Plus, Calendar, MapPin, User, FileText, Briefcase, Phone, AlertTriangle } from 'lucide-react';
@@ -9,6 +10,12 @@ interface ClientData {
     salesperson: string;
 }
 
+=======
+import React, { useState, useEffect } from 'react';
+import { Scheduling, SchedulingStatus, SchedulingPriority } from '../types';
+import { X, Save, Plus, Calendar, MapPin, User, FileText, Briefcase, Phone, AlertTriangle } from 'lucide-react';
+
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 interface SchedulingModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -18,7 +25,10 @@ interface SchedulingModalProps {
   availableSalespeople: string[];
   availableTeams: string[];
   nextOrderNumber: string;
+<<<<<<< HEAD
   knownClients?: ClientData[]; // New Prop for Autocomplete
+=======
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 }
 
 const SchedulingModal: React.FC<SchedulingModalProps> = ({ 
@@ -29,8 +39,12 @@ const SchedulingModal: React.FC<SchedulingModalProps> = ({
   availableServices,
   availableSalespeople,
   availableTeams,
+<<<<<<< HEAD
   nextOrderNumber,
   knownClients = []
+=======
+  nextOrderNumber 
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 }) => {
   const initialFormState = {
     client: '',
@@ -50,10 +64,13 @@ const SchedulingModal: React.FC<SchedulingModalProps> = ({
 
   const [formData, setFormData] = useState(initialFormState);
   
+<<<<<<< HEAD
   // Autocomplete State
   const [showClientSuggestions, setShowClientSuggestions] = useState(false);
   const [filteredClients, setFilteredClients] = useState<ClientData[]>([]);
   
+=======
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
   // States for adding new items dynamically
   const [isAddingService, setIsAddingService] = useState(false);
   const [newServiceName, setNewServiceName] = useState('');
@@ -80,6 +97,7 @@ const SchedulingModal: React.FC<SchedulingModalProps> = ({
     setIsAddingService(false); setNewServiceName('');
     setIsAddingSalesperson(false); setNewSalespersonName('');
     setIsAddingTeam(false); setNewTeamName('');
+<<<<<<< HEAD
     setShowClientSuggestions(false);
   }, [schedulingToEdit, isOpen]);
 
@@ -108,6 +126,10 @@ const SchedulingModal: React.FC<SchedulingModalProps> = ({
       setShowClientSuggestions(false);
   };
 
+=======
+  }, [schedulingToEdit, isOpen]);
+
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
   // Handle status change to auto-set completion date
   const handleStatusChange = (status: SchedulingStatus) => {
     let completion = formData.completionDate;
@@ -223,10 +245,17 @@ const SchedulingModal: React.FC<SchedulingModalProps> = ({
 
   const getPriorityColorClass = (p: SchedulingPriority) => {
     switch (p) {
+<<<<<<< HEAD
       case SchedulingPriority.URGENT: return 'text-red-600 border-red-300 bg-red-50 focus:ring-red-500 font-bold';
       case SchedulingPriority.HIGH: return 'text-orange-600 border-orange-300 bg-orange-50 font-bold';
       case SchedulingPriority.MEDIUM: return 'text-yellow-700 border-yellow-300 bg-yellow-50 font-bold';
       default: return 'bg-white text-gray-900 border-gray-300';
+=======
+      case SchedulingPriority.URGENT: return 'bg-red-50 border-red-300 text-red-700 font-bold';
+      case SchedulingPriority.HIGH: return 'bg-orange-50 border-orange-300 text-orange-700 font-bold';
+      case SchedulingPriority.MEDIUM: return 'bg-yellow-50 border-yellow-300 text-yellow-700 font-bold';
+      default: return 'bg-white border-gray-300 text-gray-900';
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
     }
   };
 
@@ -254,18 +283,27 @@ const SchedulingModal: React.FC<SchedulingModalProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* Coluna 1: Informações do Cliente e Local */}
+<<<<<<< HEAD
             <div className="space-y-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm relative">
+=======
+            <div className="space-y-4 bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
               <h3 className="font-semibold text-gray-700 border-b pb-2 mb-3 flex items-center gap-2">
                 <User size={18} className="text-cbc-orange"/> Dados Principais
               </h3>
               
+<<<<<<< HEAD
               <div className="relative">
+=======
+              <div>
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
                 <label className="block text-sm font-medium text-gray-600 mb-1">Cliente</label>
                 <input
                   type="text"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-cbc-green outline-none bg-white text-gray-900 shadow-sm"
                   placeholder="Nome do Cliente"
                   value={formData.client}
+<<<<<<< HEAD
                   onChange={handleClientChange}
                   onBlur={() => setTimeout(() => setShowClientSuggestions(false), 200)}
                 />
@@ -285,6 +323,10 @@ const SchedulingModal: React.FC<SchedulingModalProps> = ({
                         ))}
                     </ul>
                 )}
+=======
+                  onChange={e => setFormData({ ...formData, client: e.target.value })}
+                />
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
               </div>
 
               <div>
