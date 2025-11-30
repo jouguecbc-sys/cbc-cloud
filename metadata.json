@@ -1,0 +1,8 @@
+{
+  "name": "CBC Solar Tasks",
+  "description": "Sistema de gerenciamento de tarefas profissional para CBC Solar Projetos com gestão de tempo, alarmes e colaboração.",
+  "requestFramePermissions": [],
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  }
+}
