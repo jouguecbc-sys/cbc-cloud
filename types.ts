@@ -105,13 +105,55 @@ export interface Installation {
   observation: string;
 }
 
+<<<<<<< HEAD
+// Novo tipo para Clientes
+export interface Client {
+  id: string;
+  name: string;
+  phone: string;
+  location: string;
+  salesperson: string;
+  notes: string;
+  created_at?: string;
+}
+
+// Novo tipo para Reembolso (Financeiro)
+export interface Refund {
+  id: string;
+  team: string;
+  date: string;
+  description: string;
+  value: number;
+  created_at?: string;
+}
+
+// Novo tipo para Lembretes (Post-its)
+export interface Reminder {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  color: string; // Hex code or class
+  is_completed: boolean;
+  completion_date?: string;
+  is_archived: boolean;
+  created_at?: string;
+}
+
+=======
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 export interface StatisticsData {
   name: string;
   value: number;
   fill: string;
 }
 
+<<<<<<< HEAD
+export type ViewMode = 'dashboard' | 'scheduling' | 'inverter_config' | 'installation' | 'refund' | 'reminder' | 'clients' | TaskCategory;
+=======
 export type ViewMode = 'dashboard' | 'scheduling' | 'inverter_config' | 'installation' | TaskCategory;
+>>>>>>> b511febc2fc91451d023da32066bfa29f2a24dc8
 
 // --- AUTH TYPES ---
 export type UserRole = 'admin' | 'user';
